@@ -16,10 +16,20 @@
 #define VALIDATEDOT(m, n) COLS(m) == ROWS(n)
 #define VALIDATETRANS(m, n) VALIDATEDOT(m, n) && ROWS(m) == COLS(n)
 #define MAT_PRINT(m) print_mat((m), #m)
+#define MODEL_PRINT(m) print_model((m), #m);
+#define ARCH std::vector<int>
 
-#define EPOCHS 1000 * 1000
-#define LRATE 1e-1
-#define EPS 1e-3
+#define EPOCHS 10000
+#define LRATE 1
+#define EPS 1e-1
+
+typedef struct
+{
+	size_t depth;
+	std::vector<MATRIX> weights;
+	std::vector<MATRIX> biases;
+	std::vector<MATRIX> layers;
+} MODEL;
 
 // define vector & matrix
 float rand_float(float LO, float HI);
@@ -29,6 +39,7 @@ void fill_vec(VECTOR &v, float value);
 MATRIX rand_mat(size_t row, size_t col, float LO, float HI);
 void rand_mat(MATRIX &m, float LO, float HI);
 void fill_mat(MATRIX &m, float value);
+MATRIX row_mat(MATRIX &v, size_t row);
 
 // print vector & matrix
 void print_vec(const VECTOR &v);
@@ -41,10 +52,15 @@ void transpose(MATRIX &dest, MATRIX &m);
 void dot_prod(MATRIX &dest, MATRIX &m, MATRIX &n);
 
 // DNN functions
-float cost(MATRIX predicted, MATRIX target);
-void feed_forward(MATRIX &prediction, MATRIX &input, MATRIX &weight, MATRIX &bias);
-
-// float finate_diff(VECTOR input, VECTOR target, float w);
+float cost(MODEL &m, MATRIX &in, MATRIX &out);
+void feed_forward(MODEL &m, MATRIX &input);
+void finate_diff(MODEL &m, MODEL &g, MATRIX &input, MATRIX &output);
+void learn(MODEL &m, MODEL &g);
 float sigmoid(float x);
+void mat_sig(MATRIX &m);
+
+// model function
+MODEL model_alloc(ARCH arch);
+void print_model(const MODEL &m, const char *name);
 
 #endif

@@ -8,21 +8,33 @@ int main(int argc, char const *argv[])
 	float dump = rand_float(-1, 1);
 	(void)dump;
 
-	MATRIX input = {{1}, {2}, {3}};
-	MATRIX output = {{2}, {4}, {6}};
-	MATRIX weight = rand_mat(3, 1, -1, 1);
-	MATRIX bias = rand_mat(1, 1, -1, 1);
+	MATRIX inputs = {{0, 0}, {1, 0}, {0, 1}, {1, 1}};
+	MATRIX output = {{0}, {1}, {1}, {0}};
 
-	MAT_PRINT(weight);
-	std::cout << "\n";
-	MAT_PRINT(bias);
-	std::cout << "\n";
+	ARCH arch = {2, 2, 1};
+	MODEL sum = model_alloc(arch);
+	MODEL grad = model_alloc(arch);
 
-	MATRIX prediction(1, VECTOR(1));
-	feed_forward(prediction, input, weight, bias);
-	float c = cost(prediction, output);
+	/*sum.weight = rand_mat(1, 1, -1, 1);
+	sum.bias = rand_mat(1, 1, -1, 1);
+	sum.prediction = {{0}};
+	*/
+	// MAT_PRINT(sum.bias);
+	std::cout << "Cost = " << cost(sum, inputs, output) << "\n";
+	for (size_t i = 0; i < EPOCHS; i++)
+	{
+		finate_diff(sum, grad, inputs, output);
+		learn(sum, grad);
+	}
+	std::cout << "Cost = " << cost(sum, inputs, output) << "\n";
+	// MODEL_PRINT(sum);
+	for (size_t i = 0; i < 4; i++)
+	{
+		MATRIX in = row_mat(inputs, i);
+		feed_forward(sum, in);
+		MAT_PRINT(sum.layers[sum.depth - 1]);
+	}
 
-	std::cout << "Cost = " << c;
 	/* for (size_t i = 0; i < EPOCHS; i++)
 	{
 		// float dw = finate_diff(input, output, w[0], b[0]);
