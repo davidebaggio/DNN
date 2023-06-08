@@ -23,7 +23,7 @@ int main(int argc, char const *argv[])
 	(void)dump;
 
 	unsigned char *data0 = get_image_data("./testing/0/3.png");
-	VECTOR v0(x * y);
+	VECTOR v0 = {};
 	for (size_t i = 0; i < (size_t)(x * y); i++)
 	{
 		v0.push_back(static_cast<float>(data0[i]));
@@ -32,20 +32,21 @@ int main(int argc, char const *argv[])
 	// print_vec(v);
 
 	unsigned char *data1 = get_image_data("./testing/1/2.png");
-	VECTOR v1(x * y);
+	VECTOR v1 = {};
 	for (size_t i = 0; i < (size_t)(x * y); i++)
 	{
 		v1.push_back(static_cast<float>(data1[i]));
 	}
 	stbi_image_free(data1);
 
+	// MATRIX inputs = {{0, 0}, {1, 0}, {0, 1}, {1, 1}};
+	// MATRIX output = {{0}, {1}, {1}, {1}};
 	MATRIX inputs = {{v0}, {v1}};
 	MATRIX output = {{0}, {1}};
 
 	ARCH arch = {28 * 28, 18, 18, 1};
 	MODEL image = model_alloc(arch);
 	MODEL grad = model_alloc(arch);
-	MAT_DIM(inputs);
 
 	for (size_t k = 0; k < image.depth; k++)
 	{
@@ -56,15 +57,17 @@ int main(int argc, char const *argv[])
 	std::cout << "Cost = " << cost(image, inputs, output) << "\n";
 	for (size_t i = 0; i < EPOCHS; i++)
 	{
-		finate_diff(image, grad, inputs, output);
+		// finate_diff(image, grad, inputs, output);
+		back_propagation(image, grad, inputs, output);
 		learn(image, grad);
+		std::cout << "Cost = " << cost(image, inputs, output) << "\n";
+		// std::cout << "Iteration " << i << "\n";
 	}
-	std::cout << "Cost = " << cost(image, inputs, output) << "\n";
 	for (size_t i = 0; i < 2; i++)
 	{
 		MATRIX in = row_mat(inputs, i);
 		feed_forward(image, in);
-		MAT_PRINT(image.layers[image.depth - 1]);
+		MAT_PRINT(MODEL_OUT(image));
 	}
 	return 0;
 }

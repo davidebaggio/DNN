@@ -233,6 +233,55 @@ void finate_diff(MODEL &m, MODEL &g, MATRIX &input, MATRIX &output)
 	}
 }
 
+void back_propagation(MODEL &m, MODEL &g, MATRIX &input, MATRIX &output)
+{
+	assert(ROWS(input) == ROWS(output));
+	size_t inputs = ROWS(input);
+	size_t outputs = COLS(output);
+	for (size_t i = 0; i < inputs; i++)
+	{
+		MATRIX in = row_mat(input, i);
+		feed_forward(m, in);
+		for (size_t j = 0; j < outputs; j++)
+		{
+			g.layers[g.depth - 1][0][j] = MODEL_OUT(m)[0][j] - output[i][j];
+		}
+		for (size_t l = m.depth - 1; l > 0; l--)
+		{
+			for (size_t j = 0; j < COLS(m.layers[l]); j++)
+			{
+				float a = m.layers[l][0][j];
+				float da = g.layers[l][0][j];
+				g.biases[l - 1][0][j] *= 2 * da * a * (1 - a);
+				for (size_t k = 0; k < COLS(m.layers[l - 1]); k++)
+				{
+					float pa = m.layers[l - 1][0][k];
+					float w = m.weights[l - 1][k][j];
+					g.weights[l - 1][k][j] += da * a * (1 - a) * pa;
+					g.layers[l - 1][0][k] += da * a * (1 - a) * w;
+				}
+			}
+		}
+	}
+	for (size_t i = 0; i < g.depth; i++)
+	{
+		for (size_t j = 0; j < ROWS(g.weights[i]); j++)
+		{
+			for (size_t k = 0; k < COLS(g.weights[i]); k++)
+			{
+				g.weights[i][j][k] /= inputs;
+			}
+		}
+		for (size_t j = 0; j < ROWS(g.biases[i]); j++)
+		{
+			for (size_t k = 0; k < COLS(g.biases[i]); k++)
+			{
+				g.biases[i][j][k] /= inputs;
+			}
+		}
+	}
+}
+
 void learn(MODEL &m, MODEL &g)
 {
 	for (size_t k = 0; k < m.depth; k++)

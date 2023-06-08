@@ -18,9 +18,10 @@
 #define MAT_PRINT(m) print_mat((m), #m)
 #define MAT_DIM(m) print_mat_dim((m), #m)
 #define MODEL_PRINT(m) print_model((m), #m)
+#define MODEL_OUT(m) (m).layers[(m).depth - 1]
 #define ARCH std::vector<int>
 
-#define EPOCHS 10000
+#define EPOCHS 1000 * 10
 #define LRATE 1
 #define EPS 1e-1
 
@@ -58,6 +59,7 @@ void dot_prod(MATRIX &dest, MATRIX &m, MATRIX &n);
 float cost(MODEL &m, MATRIX &in, MATRIX &out);
 void feed_forward(MODEL &m, MATRIX &input);
 void finate_diff(MODEL &m, MODEL &g, MATRIX &input, MATRIX &output);
+void back_propagation(MODEL &m, MODEL &g, MATRIX &input, MATRIX &output);
 void learn(MODEL &m, MODEL &g);
 float sigmoid(float x);
 void mat_sig(MATRIX &m);
