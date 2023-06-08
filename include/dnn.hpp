@@ -12,11 +12,12 @@
 #define MATRIX std::vector<std::vector<float>>
 #define ROWS(m) (m).size()
 #define COLS(m) ((m)[0]).size()
-#define VALIDATESIZE(m, n) ROWS(m) == ROWS(n) && COLS(m) == COLS(n)
-#define VALIDATEDOT(m, n) COLS(m) == ROWS(n)
-#define VALIDATETRANS(m, n) VALIDATEDOT(m, n) && ROWS(m) == COLS(n)
+#define VALIDATESIZE(m, n) ROWS((m)) == ROWS((n)) && COLS((m)) == COLS((n))
+#define VALIDATEDOT(m, n) COLS((m)) == ROWS((n))
+#define VALIDATETRANS(m, n) VALIDATEDOT(m, n) && ROWS((m)) == COLS((n))
 #define MAT_PRINT(m) print_mat((m), #m)
-#define MODEL_PRINT(m) print_model((m), #m);
+#define MAT_DIM(m) print_mat_dim((m), #m)
+#define MODEL_PRINT(m) print_model((m), #m)
 #define ARCH std::vector<int>
 
 #define EPOCHS 10000
@@ -39,11 +40,13 @@ void fill_vec(VECTOR &v, float value);
 MATRIX rand_mat(size_t row, size_t col, float LO, float HI);
 void rand_mat(MATRIX &m, float LO, float HI);
 void fill_mat(MATRIX &m, float value);
+MATRIX vec_to_mat(VECTOR &v);
 MATRIX row_mat(MATRIX &v, size_t row);
 
 // print vector & matrix
 void print_vec(const VECTOR &v);
 void print_mat(const MATRIX &m, const char *name);
+void print_mat_dim(const MATRIX &m, const char *name);
 
 // matrix operation
 void scalar_prod(MATRIX &dest, MATRIX &m, float scalar);

@@ -64,6 +64,16 @@ void fill_mat(MATRIX &m, float value)
 	}
 }
 
+MATRIX vec_to_mat(VECTOR &v)
+{
+	MATRIX m(1, VECTOR(v.size()));
+	for (size_t i = 0; i < v.size(); i++)
+	{
+		m[0][i] = v[i];
+	}
+	return m;
+}
+
 MATRIX row_mat(MATRIX &m, size_t row)
 {
 	MATRIX n(1, VECTOR(COLS(m)));
@@ -94,6 +104,11 @@ void print_mat(const MATRIX &m, const char *name)
 		print_vec(m[i]);
 	}
 	std::cout << "]\n";
+}
+
+void print_mat_dim(const MATRIX &m, const char *name)
+{
+	std::cout << name << ": ROWS = " << ROWS(m) << ", COLS = " << COLS(m) << "\n";
 }
 
 // matrix operation
