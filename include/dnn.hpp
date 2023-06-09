@@ -21,8 +21,8 @@
 #define MODEL_OUT(m) (m).layers[(m).depth - 1]
 #define ARCH std::vector<int>
 
-#define EPOCHS 1000 * 10
-#define LRATE 1
+#define EPOCHS 100
+#define LRATE 1e-2
 #define EPS 1e-1
 
 typedef struct
@@ -43,6 +43,7 @@ void rand_mat(MATRIX &m, float LO, float HI);
 void fill_mat(MATRIX &m, float value);
 MATRIX vec_to_mat(VECTOR &v);
 MATRIX row_mat(MATRIX &v, size_t row);
+void copy_mat(MATRIX &dest, MATRIX &src);
 
 // print vector & matrix
 void print_vec(const VECTOR &v);

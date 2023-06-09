@@ -39,12 +39,12 @@ int main(int argc, char const *argv[])
 	}
 	stbi_image_free(data1);
 
-	// MATRIX inputs = {{0, 0}, {1, 0}, {0, 1}, {1, 1}};
-	// MATRIX output = {{0}, {1}, {1}, {1}};
-	MATRIX inputs = {{v0}, {v1}};
+	MATRIX inputs = {{0, 0}, {1, 0}, {0, 1}, {1, 1}};
+	MATRIX output = {{0}, {1}, {1}, {1}};
+	/* MATRIX inputs = {{v0}, {v1}};
 	MATRIX output = {{0}, {1}};
-
-	ARCH arch = {28 * 28, 18, 18, 1};
+ */
+	ARCH arch = {2, 2, 1};
 	MODEL image = model_alloc(arch);
 	MODEL grad = model_alloc(arch);
 
@@ -60,14 +60,15 @@ int main(int argc, char const *argv[])
 		// finate_diff(image, grad, inputs, output);
 		back_propagation(image, grad, inputs, output);
 		learn(image, grad);
-		std::cout << "Cost = " << cost(image, inputs, output) << "\n";
 		// std::cout << "Iteration " << i << "\n";
 	}
-	for (size_t i = 0; i < 2; i++)
+	std::cout << "Cost = " << cost(image, inputs, output) << "\n";
+	for (size_t i = 0; i < 4; i++)
 	{
 		MATRIX in = row_mat(inputs, i);
 		feed_forward(image, in);
-		MAT_PRINT(MODEL_OUT(image));
+		MATRIX f = MODEL_OUT(image);
+		MAT_PRINT(f);
 	}
 	return 0;
 }

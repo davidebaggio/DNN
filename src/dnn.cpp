@@ -84,6 +84,18 @@ MATRIX row_mat(MATRIX &m, size_t row)
 	return n;
 }
 
+void copy_mat(MATRIX &dest, MATRIX &src)
+{
+	assert(VALIDATESIZE(dest, src));
+	for (size_t i = 0; i < ROWS(dest); i++)
+	{
+		for (size_t j = 0; j < COLS(dest); j++)
+		{
+			dest[i][j] = src[i][j];
+		}
+	}
+}
+
 // print vector & matrix
 
 void print_vec(const VECTOR &v)
@@ -191,9 +203,7 @@ float cost(MODEL &m, MATRIX &input, MATRIX &output)
 
 void feed_forward(MODEL &m, MATRIX &input)
 {
-	dot_prod(m.layers[0], input, m.weights[0]);
-	matrix_sum(m.layers[0], m.biases[0]);
-	mat_sig(m.layers[0]);
+	copy_mat(m.layers[0], input);
 	for (size_t k = 1; k < m.depth; k++)
 	{
 		dot_prod(m.layers[k], m.layers[k - 1], m.weights[k]);
@@ -252,13 +262,14 @@ void back_propagation(MODEL &m, MODEL &g, MATRIX &input, MATRIX &output)
 			{
 				float a = m.layers[l][0][j];
 				float da = g.layers[l][0][j];
-				g.biases[l - 1][0][j] *= 2 * da * a * (1 - a);
+				g.biases[l][0][j] += a * (1 - a) * 2 * da;
 				for (size_t k = 0; k < COLS(m.layers[l - 1]); k++)
 				{
 					float pa = m.layers[l - 1][0][k];
-					float w = m.weights[l - 1][k][j];
-					g.weights[l - 1][k][j] += da * a * (1 - a) * pa;
-					g.layers[l - 1][0][k] += da * a * (1 - a) * w;
+					float w = m.weights[l][k][j];
+					g.weights[l][k][j] += pa * a * (1 - a) * 2 * da;
+					g.layers[l - 1][0][k] += w * a * (1 - a) * 2 * da;
+					MODEL_PRINT(g);
 				}
 			}
 		}
@@ -325,7 +336,9 @@ void mat_sig(MATRIX &m)
 MODEL model_alloc(ARCH arch)
 {
 	MODEL m;
-	m.depth = arch.size() - 1;
+	m.depth = arch.size();
+	MATRIX i(1, VECTOR(arch[0]));
+	m.layers.push_back(i);
 	for (size_t i = 0; i < arch.size() - 1; i++)
 	{
 		MATRIX w = rand_mat(arch[i], arch[i + 1], -1, 1);
